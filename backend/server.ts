@@ -18,7 +18,15 @@ app.use(cors({
   origin: ['http://localhost:3000', 'http://localhost:3001','https://skill-syncer.vercel.app'], // Add your frontend URLs
   credentials: true
 }));
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+  next();
+});
 app.use(helmet());
+app.use((req, res, next) => {
+  res.setHeader("Cache-Control", "no-store"); // or adjust as needed
+  next();
+});
 app.use(express.json());
 
 // MongoDB Connection
