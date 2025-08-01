@@ -198,7 +198,9 @@ export default function CareerIdentityPage() {
 
       try {
         setDataFetchError(false); // Reset error state
-        const res = await axios.get(`http://localhost:5000/api/userData/${user.id}`);
+        // const res = await axios.get(`http://localhost:5000/api/userData/${user.id}`);
+        const res = await axios.get(`https://skillsyncer-production.up.railway.app/api/userData/${user.id}`);
+
         console.log("✅ Fetching data for user ID:", user.id);
 
         const data = res.data;
@@ -222,7 +224,8 @@ export default function CareerIdentityPage() {
 
   const handleDelete = async (docId: string) => {
     try {
-      await axios.delete(`http://localhost:5000/api/userData/${docId}`);
+      // await axios.delete(`http://localhost:5000/api/userData/${docId}`);
+      await axios.delete(`https://skillsyncer-production.up.railway.app/api/userData/${docId}`);
       const updatedData = userData.filter(entry => entry._id !== docId);
       setUserData(updatedData);
       

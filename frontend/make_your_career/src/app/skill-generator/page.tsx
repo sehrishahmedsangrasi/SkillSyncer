@@ -17,9 +17,23 @@ export default function SkillsGenerator() {
   const canProceed = eduFilled || expFilled;
 
   // Upload user ID to backend on mount
+  // useEffect(() => {
+  //   if (isSignedIn && userId) {
+  //     fetch("http://localhost:5000/api/save-user", {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify({ userId }),
+  //     })
+  //     .then(res => res.json())
+  //     .then(data => console.log("User saved:", data))
+  //     .catch(err => console.error("Error uploading user ID:", err));
+  //   }
+  // }, [userId, isSignedIn]);
   useEffect(() => {
     if (isSignedIn && userId) {
-      fetch("http://localhost:5000/api/save-user", {
+      fetch("https://skillsyncer-production.up.railway.app/api/save-user", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -31,6 +45,7 @@ export default function SkillsGenerator() {
       .catch(err => console.error("Error uploading user ID:", err));
     }
   }, [userId, isSignedIn]);
+
 
   const handleClick = () => {
     if (canProceed) {

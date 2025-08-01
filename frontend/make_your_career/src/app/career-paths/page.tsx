@@ -57,7 +57,8 @@ export default function CareerPathsPage() {
       if (!user?.id) return;
 
       try {
-        const res = await axios.get(`http://localhost:5000/api/userData/${user.id}`);
+        // const res = await axios.get(`http://localhost:5000/api/userData/${user.id}`);
+        const res = await axios.get(`https://skillsyncer-production.up.railway.app/api/userData/${user.id}`);
         console.log("✅ Fetching data for user ID:", user.id);
 
         const data = res.data;

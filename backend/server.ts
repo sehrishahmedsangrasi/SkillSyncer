@@ -15,7 +15,7 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://localhost:3001'], // Add your frontend URLs
+  origin: ['http://localhost:3000', 'http://localhost:3001','https://skill-syncer.vercel.app'], // Add your frontend URLs
   credentials: true
 }));
 app.use(helmet());

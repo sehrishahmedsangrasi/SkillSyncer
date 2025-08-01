@@ -426,7 +426,15 @@ export default function SkillsPage() {
 
     console.log("📦 Payload to send:", payload);
 
-    const response = await fetch("http://localhost:5000/api/save-career-data", {
+    // const response = await fetch("http://localhost:5000/api/save-career-data", {
+    //   method: "POST",
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //     Authorization: `Bearer ${token}`,
+    //   },
+    //   body: JSON.stringify(payload),
+    // });
+    const response = await fetch("https://skillsyncer-production.up.railway.app/api/save-career-data", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
