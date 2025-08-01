@@ -59,7 +59,10 @@ import userRoutes from "./routes/userRoutes";
 import saveCareerDataRoute from "./routes/save-career-data";
 import userData from "./routes/userData";
 
-dotenv.config();
+// Only load .env in development, not in production
+if (process.env.NODE_ENV !== 'production') {
+  dotenv.config();
+}
 
 const app = express();
 
@@ -116,8 +119,10 @@ app.get("/", (req, res) => {
   });
 });
 
-// FIXED: Railway port configuration
-const PORT = process.env.PORT || 8080;
+// FIXED: Ensure Railway's PORT is used, ignore .env PORT
+const PORT = process.env.NODE_ENV === 'production' 
+  ? (process.env.PORT || 3000)  // In production, use Railway's PORT
+  : (process.env.PORT || 8080); // In development, allow .env override
 
 // Debug environment variables
 console.log('🔍 Environment Debug:');

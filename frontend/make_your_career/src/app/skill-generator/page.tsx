@@ -33,7 +33,7 @@ export default function SkillsGenerator() {
   // }, [userId, isSignedIn]);
   useEffect(() => {
     if (isSignedIn && userId) {
-      fetch("https://skillsyncer-production.up.railway.app/api/save-user", {
+      fetch("https://skillsyncer-production-29f2.up.railway.app/api/save-user", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

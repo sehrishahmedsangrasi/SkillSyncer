@@ -434,7 +434,7 @@ export default function SkillsPage() {
     //   },
     //   body: JSON.stringify(payload),
     // });
-    const response = await fetch("https://skillsyncer-production.up.railway.app/api/save-career-data", {
+    const response = await fetch("https://skillsyncer-production-29f2.up.railway.app/api/save-career-data", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
