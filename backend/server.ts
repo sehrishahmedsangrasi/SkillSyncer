@@ -86,12 +86,20 @@ app.use(express.json());
 
 // MongoDB Connection
 const mongoURI = process.env.MONGODB_URI as string;
+
+if (!mongoURI) {
+  console.error("❌ MONGODB_URI environment variable is not set");
+  process.exit(1);
+}
+
 mongoose.connect(mongoURI)
   .then(() => {
     console.log("✅ Connected to MongoDB");
-    console.log("✅ Loaded MONGODB_URI:", mongoURI);
   })
-  .catch((err) => console.error("❌ MongoDB connection error:", err));
+  .catch((err) => {
+    console.error("❌ MongoDB connection error:", err);
+    process.exit(1);
+  });
 
 // Routes
 app.use("/api", userRoutes);
@@ -100,21 +108,53 @@ app.use("/api", userData);
 
 // Health check
 app.get("/", (req, res) => {
-  res.send("✅ Backend is running!");
+  res.json({ 
+    message: "✅ Backend is running!", 
+    timestamp: new Date().toISOString(),
+    env: process.env.NODE_ENV || 'development',
+    port: process.env.PORT || 'not set'
+  });
 });
 
-// Start server - CORRECTED VERSION
-// Using parseInt
-// Start server
-const PORT = Number(process.env.PORT) || 8080;
+// FIXED: Railway port configuration
+const PORT = process.env.PORT || 8080;
 
-const server = app.listen(PORT, '0.0.0.0', () => {
+// Debug environment variables
+console.log('🔍 Environment Debug:');
+console.log('- NODE_ENV:', process.env.NODE_ENV);
+console.log('- PORT from env:', process.env.PORT);
+console.log('- Final PORT:', PORT);
+console.log('- MONGODB_URI exists:', !!process.env.MONGODB_URI);
+
+const server = app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`🌐 Accessible at: http://0.0.0.0:${PORT}`);
+  console.log(`🌐 Server accessible at: http://0.0.0.0:${PORT}`);
 });
 
 // Handle server errors
-server.on('error', (err) => {
-  console.error('❌ Failed to start server:', err);
+server.on('error', (err: any) => {
+  console.error('❌ Server error:', err);
+  if (err.code === 'EADDRINUSE') {
+    console.error(`❌ Port ${PORT} is already in use`);
+  }
   process.exit(1);
+});
+
+// Graceful shutdown
+process.on('SIGTERM', () => {
+  console.log('👋 SIGTERM received, shutting down gracefully');
+  server.close(() => {
+    console.log('✅ Server closed');
+    mongoose.connection.close();
+    process.exit(0);
+  });
+});
+
+process.on('SIGINT', () => {
+  console.log('👋 SIGINT received, shutting down gracefully');
+  server.close(() => {
+    console.log('✅ Server closed');
+    mongoose.connection.close();
+    process.exit(0);
+  });
 });
