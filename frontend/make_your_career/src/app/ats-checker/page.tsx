@@ -6,7 +6,10 @@ import NavBar from "../../components/navbar";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
 
-import { getDocument, GlobalWorkerOptions } from "pdfjs-dist";
+// @ts-ignore
+import { getDocument, GlobalWorkerOptions } from "pdfjs-dist/legacy/build/pdf";
+
+
 
 // ✅ Dynamic worker loading to match installed version
 
