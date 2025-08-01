@@ -1,0 +1,23 @@
+@import "tailwindcss";
+
+@theme{
+  --color-lavender:#a06bf5;
+  --color-hlavendar:#9458f3;
+}
+.glow-lavender:hover {
+  color: var(--color-lavender);
+  text-shadow:
+    0 0 5px var(--color-lavender),
+    0 0 10px var(--color-lavender),
+    0 0 15px var(--color-lavender),
+    0 0 20px var(--color-hlavendar);
+}
+.cl-internal-fcx671{
+  color: #a06bf5 !important,
+}
+.input {
+  @apply bg-black border border-lavender text-white rounded-xl px-4 py-2 mb-4 w-full focus:outline-none focus:ring-2 focus:ring-purple-400;
+}
+
+
+
