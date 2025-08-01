@@ -6,8 +6,8 @@ import NavBar from "../../components/navbar";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
 
-// @ts-ignore
-import { getDocument, GlobalWorkerOptions } from "pdfjs-dist/legacy/build/pdf";
+// // @ts-ignore
+// import { getDocument, GlobalWorkerOptions } from "pdfjs-dist/webpack";
 
 
 
@@ -25,50 +25,47 @@ export default function ATSChecker() {
 
   // ✅ Load PDF.js worker dynamically
   useEffect(() => {
-    const loadWorker = async () => {
-      try {
-        // Try different methods to load the worker
-        if (typeof window !== 'undefined') {
-          GlobalWorkerOptions.workerSrc = new URL(
-            'pdfjs-dist/build/pdf.worker.min.js',
-            import.meta.url
-          ).toString();
-        }
-        setWorkerLoaded(true);
-      } catch (error) {
-        // Fallback to a compatible CDN version
-        GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.worker.min.js`;
-        setWorkerLoaded(true);
-      }
-    };
-    loadWorker();
-  }, []);
-
-  const extractTextFromPDF = async (file: File) => {
-    if (!workerLoaded) {
-      alert("Please wait, PDF processor is loading...");
-      return "";
-    }
-    
+  const loadWorker = async () => {
     try {
-      const arrayBuffer = await file.arrayBuffer();
-      const pdf = await getDocument({ data: arrayBuffer }).promise;
-
-      let text = "";
-      for (let i = 1; i <= pdf.numPages; i++) {
-        const page = await pdf.getPage(i);
-        const content = await page.getTextContent();
-        const pageText = content.items.map((item: any) => item.str).join(" ");
-        text += pageText + "\n";
+      if (typeof window !== 'undefined') {
+        const pdfjsLib = await import('pdfjs-dist/legacy/build/pdf');
+        pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js`;
+        setWorkerLoaded(true);
       }
-
-      return text;
     } catch (error) {
-      console.error("PDF extraction error:", error);
-      alert("Error extracting PDF text. Try another file.");
-      return "";
+      console.error('Worker loading failed:', error);
+      setWorkerLoaded(true);
     }
   };
+  loadWorker();
+}, []);
+
+  const extractTextFromPDF = async (file: File) => {
+  if (!workerLoaded) {
+    alert("Please wait, PDF processor is loading...");
+    return "";
+  }
+  
+  try {
+    const pdfjsLib = await import('pdfjs-dist/legacy/build/pdf');
+    const arrayBuffer = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+
+    let text = "";
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const page = await pdf.getPage(i);
+      const content = await page.getTextContent();
+      const pageText = content.items.map((item: any) => item.str).join(" ");
+      text += pageText + "\n";
+    }
+
+    return text;
+  } catch (error) {
+    console.error("PDF extraction error:", error);
+    alert("Error extracting PDF text. Try another file.");
+    return "";
+  }
+};
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
