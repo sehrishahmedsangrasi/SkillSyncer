@@ -24,32 +24,45 @@ export default function ATSChecker() {
   // Remove the genAI initialization since we'll use API route
 
   // ✅ Load PDF.js worker dynamically
-  useEffect(() => {
-  const loadWorker = async () => {
-    try {
-      if (typeof window !== 'undefined') {
-        const pdfjsLib = await import('pdfjs-dist/legacy/build/pdf');
-        pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js`;
+  // ✅ Load PDF.js from CDN to avoid webpack issues
+useEffect(() => {
+  const loadPDFJS = () => {
+    if (typeof window === 'undefined') return;
+    
+    // Check if already loaded
+    if ((window as any).pdfjsLib) {
+      setWorkerLoaded(true);
+      return;
+    }
+
+    const script = document.createElement('script');
+    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+    script.onload = () => {
+      if ((window as any).pdfjsLib) {
+        (window as any).pdfjsLib.GlobalWorkerOptions.workerSrc = 
+          'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
         setWorkerLoaded(true);
       }
-    } catch (error) {
-      console.error('Worker loading failed:', error);
-      setWorkerLoaded(true);
-    }
+    };
+    script.onerror = () => {
+      console.error('Failed to load PDF.js');
+      setWorkerLoaded(false);
+    };
+    document.head.appendChild(script);
   };
-  loadWorker();
+
+  loadPDFJS();
 }, []);
 
-  const extractTextFromPDF = async (file: File) => {
-  if (!workerLoaded) {
+const extractTextFromPDF = async (file: File) => {
+  if (!workerLoaded || !(window as any).pdfjsLib) {
     alert("Please wait, PDF processor is loading...");
     return "";
   }
   
   try {
-    const pdfjsLib = await import('pdfjs-dist/legacy/build/pdf');
     const arrayBuffer = await file.arrayBuffer();
-    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+    const pdf = await (window as any).pdfjsLib.getDocument({ data: arrayBuffer }).promise;
 
     let text = "";
     for (let i = 1; i <= pdf.numPages; i++) {
@@ -66,7 +79,6 @@ export default function ATSChecker() {
     return "";
   }
 };
-
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
