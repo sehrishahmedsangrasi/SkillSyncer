@@ -1,12 +1,11 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "main": "dist/server.js",
+  "main": "index.js",
   "scripts": {
     "dev": "ts-node server.ts",
     "build": "tsc",
-    "start": "npm run build && node dist/server.js",
-    "postinstall": "npm run build"
+    "start": "node dist/server.js"
   },
   "keywords": [],
   "author": "",
@@ -25,14 +24,14 @@
     "helmet": "^8.1.0",
     "mongoose": "^8.16.5",
     "pdf-lib": "^1.17.1",
-    "pizzip": "^3.2.0",
-    "typescript": "^5.8.3"
+    "pizzip": "^3.2.0"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
     "@types/helmet": "^0.0.48",
     "@types/node": "^24.1.0",
-    "ts-node": "^10.9.2"
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
   }
 }
