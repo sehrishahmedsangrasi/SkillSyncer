@@ -1,109 +1,113 @@
 import express, { Request, Response, NextFunction } from "express";
-// Remove: import cors from "cors";
-import helmet from "helmet";
 import dotenv from "dotenv";
-import mongoose from "mongoose";
-import userRoutes from "./routes/userRoutes";
-import saveCareerDataRoute from "./routes/save-career-data";
-import userData from "./routes/userData";
 
 dotenv.config();
 
 const app = express();
 
-// Manual CORS handler - FIRST middleware
+// CORS middleware - FIRST
 app.use((req: Request, res: Response, next: NextFunction) => {
   const origin = req.get('Origin');
-  const allowedOrigins = [
-    'http://localhost:3000',
-    'http://localhost:3001', 
-    'https://skill-syncer.vercel.app'
-  ];
-
-  console.log(`🌍 Request from origin: ${origin}`);
-  console.log(`🔍 Method: ${req.method}, Path: ${req.path}`);
-
-  // Check if origin is allowed
-  if (origin && allowedOrigins.includes(origin)) {
-    res.header('Access-Control-Allow-Origin', origin);
-    console.log(`✅ CORS allowed for: ${origin}`);
-  } else if (!origin) {
-    // Same-origin requests (like direct API testing)
-    res.header('Access-Control-Allow-Origin', '*');
-    console.log(`✅ CORS allowed for same-origin request`);
-  } else {
-    console.log(`❌ CORS blocked for: ${origin}`);
-  }
-
-  res.header('Access-Control-Allow-Credentials', 'true');
+  console.log(`🌍 ${req.method} ${req.path} from origin: ${origin}`);
+  
+  // Set CORS headers
+  res.header('Access-Control-Allow-Origin', 'https://skill-syncer.vercel.app');
   res.header('Access-Control-Allow-Methods', 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Origin,X-Requested-With,Content-Type,Accept,Authorization');
-  res.header('Access-Control-Max-Age', '86400');
-
-  // Handle preflight requests
+  res.header('Access-Control-Allow-Credentials', 'true');
+  res.header('Cache-Control', 'no-cache');
+  
+  console.log('✅ CORS headers set');
+  
+  // Handle preflight
   if (req.method === 'OPTIONS') {
-    console.log(`✈️ Preflight request handled for ${req.path}`);
+    console.log('✈️ Preflight request - sending 200');
     return res.sendStatus(200);
   }
-
+  
   next();
 });
-
-// Configure Helmet to not interfere
-app.use(helmet({
-  crossOriginResourcePolicy: { policy: "cross-origin" },
-  crossOriginEmbedderPolicy: false,
-  contentSecurityPolicy: false
-}));
 
 // Body parser
 app.use(express.json());
 
-// MongoDB Connection
-mongoose
-  .connect(process.env.MONGODB_URI as string)
-  .then(() => console.log("✅ Connected to MongoDB"))
-  .catch((err) => console.error("❌ MongoDB connection error:", err));
-
-console.log("✅ MONGODB_URI loaded:", process.env.MONGODB_URI ? "Present" : "Missing");
-
-// Routes
-app.use("/api", userRoutes);
-app.use("/api", saveCareerDataRoute);
-app.use("/api", userData);
-
-// Test routes
+// Test route
 app.get("/", (req: Request, res: Response) => {
+  console.log('📍 Root route accessed');
   res.json({ 
     message: "Backend is running!",
-    timestamp: new Date().toISOString(),
-    origin: req.get('Origin'),
-    cors: "manual"
-  });
-});
-
-app.get("/api/health", (req: Request, res: Response) => {
-  res.json({ 
-    status: "healthy",
-    cors: "manual-configured",
-    origin: req.get('Origin'),
     timestamp: new Date().toISOString()
   });
 });
 
-// Error handler
-app.use((err: any, req: Request, res: Response, next: NextFunction) => {
-  console.error("💥 Server Error:", err);
-  res.status(500).json({ 
-    success: false, 
-    error: "Internal server error",
-    message: err.message 
+// Health check
+app.get("/api/health", (req: Request, res: Response) => {
+  console.log('🏥 Health check');
+  res.json({ 
+    status: "healthy",
+    timestamp: new Date().toISOString()
   });
 });
 
-// Start server
+// Save career data route - DIRECTLY in server (no external route file)
+app.post("/api/save-career-data", (req: Request, res: Response) => {
+  console.log('💾 POST /api/save-career-data received');
+  console.log('📦 Body:', req.body);
+  console.log('🔑 Auth header:', req.get('Authorization'));
+  
+  try {
+    const { skills, education, experience } = req.body;
+    
+    if (!skills || skills.length === 0) {
+      console.log('❌ No skills provided');
+      return res.status(400).json({
+        success: false,
+        error: "Skills are required"
+      });
+    }
+    
+    console.log('✅ Processing skills:', skills);
+    
+    // Success response
+    res.json({
+      success: true,
+      message: "Career data received successfully",
+      data: { skills, education, experience },
+      timestamp: new Date().toISOString()
+    });
+    
+  } catch (error: any) {
+    console.error('💥 Error in save-career-data:', error);
+    res.status(500).json({
+      success: false,
+      error: "Server error",
+      details: error.message
+    });
+  }
+});
+
+// Catch-all error handler
+app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+  console.error('💥 Unhandled error:', err);
+  res.status(500).json({
+    success: false,
+    error: 'Internal server error',
+    message: err.message
+  });
+});
+
+// 404 handler
+app.use('*', (req: Request, res: Response) => {
+  console.log(`❌ 404 - Route not found: ${req.method} ${req.originalUrl}`);
+  res.status(404).json({
+    success: false,
+    error: 'Route not found',
+    path: req.originalUrl
+  });
+});
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`🌐 Manual CORS enabled for: http://localhost:3000, http://localhost:3001, https://skill-syncer.vercel.app`);
+  console.log(`🌐 CORS enabled for: https://skill-syncer.vercel.app`);
 });
