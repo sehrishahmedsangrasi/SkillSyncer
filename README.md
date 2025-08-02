@@ -2,7 +2,7 @@
 
 SkillSyncer is a MERN stack web application that helps users take control of their career journey by generating personalized skills, evaluating their resume's ATS performance, and exploring career paths based on their unique strengths. Designed to make job searching smarter and more intuitive, SkillSyncer blends technology with career insight to guide users toward roles that truly fit.
 
---
+---
 
 ## ✨ Features
 
