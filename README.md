@@ -15,7 +15,7 @@ SkillSyncer is a MERN stack web application that helps users take control of the
 
 ## 🔧 Tech Stack
 
-- **Frontend:** React, Tailwind CSS  
+- **Frontend:** NextJS, Tailwind CSS  
 - **Backend:** Node.js, Express.js  
 - **Database:** MongoDB  
 - **Authentication:** JWT  
