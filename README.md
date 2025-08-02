@@ -18,7 +18,7 @@ SkillSyncer is a MERN stack web application that helps users take control of the
 - **Frontend:** NextJS, Tailwind CSS  
 - **Backend:** Node.js, Express.js  
 - **Database:** MongoDB  
-- **Authentication:** JWT  
+- **Authentication:** Clerk
 - **APIs:** RESTful APIs
 
 ---
@@ -27,7 +27,7 @@ SkillSyncer is a MERN stack web application that helps users take control of the
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/skillsyncer.git
+git clone https://github.com/sehrishahmedsangrasi/skillsyncer.git
 
 # Navigate into the project directory
 cd skillsyncer
@@ -41,7 +41,7 @@ npm install
 # Add environment variables to a .env file in /server
 # Example:
 # MONGO_URI=your_mongo_connection
-# JWT_SECRET=your_jwt_secret
+# clerk_SECRET=your_clerk_secret
 # PORT=5000
 
 # Run the app
